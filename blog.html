@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>My Blog</title>
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+   <style>
+      body {
+         background-image: url("circuit-board-2440249.jpg");
+         background-size: cover;
+         background-position: center;
+         background-repeat: no-repeat;
+         height: 100vh;
+         margin: 0;
+      }
+      nav {
+         width: 220px;
+         height: 100%;
+         background-color: #333;
+         float: left;
+         /* display: none;  초기에 숨김 */
+      }
+      ul {
+         list-style-type: none;
+         margin: 0;
+         padding: 0;
+      }
+      li {
+         display: block;
+      }
+      a {
+         display: block;
+         color: white;
+         text-align: center;
+         padding: 14px 16px;
+         text-decoration: none;
+         position: relative;
+      }
+      a:hover {
+         background-color: #111;
+      }
+      .dropdown-menu {
+         display: none;
+      }
+      .dropdown.active .dropdown-menu {
+         display: block;
+      }
+      .arrow-down {
+         position: absolute;
+         top: 50%;
+         right: 10px;
+         transform: translateY(-50%);
+         width: 0;
+         height: 0;
+         border-left: 5px solid transparent;
+         border-right: 5px solid transparent;
+         border-top: 5px solid white;
+      }
+      .toggle-btn {
+         color: white;
+         font-size: 24px;
+         margin: 16px;
+         cursor: pointer;
+      }
+      #detailbox {
+            display: inline-block; /*div 박스가 둘다 inline-block으로 설정해주면 옆으로 나란히 선다.*/
+/*          float: right;*/
+            margin: 10px;
+            padding: 10px;
+            border-style: dotted;
+            border-width: 2px;
+            width: 400px;
+            background: whitesmoke;
+         }
+   </style>
+   <script>
+      window.addEventListener('DOMContentLoaded', function() {
+         var dropdowns = document.getElementsByClassName('dropdown');
+         var nav = document.querySelector('nav');
+         var toggleBtn = document.getElementById('toggleBtn');
+
+         for (var i = 0; i < dropdowns.length; i++) {
+            dropdowns[i].addEventListener('click', function() {
+               this.classList.toggle('active');
+            });
+         }
+
+         toggleBtn.addEventListener('click', function() {
+            nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+         });
+      });
+   </script>
+</head>
+<body>
+   <i id="toggleBtn" class="toggle-btn fas fa-bars"></i> <!-- 토글 버튼 아이콘 추가 -->
+   <nav>
+      <ul>
+         <li><a href="#"><i class="fa-solid fa-house"></i> Home</a></li>
+         <li class="dropdown">
+            <a href="#"><i class="fa-solid fa-pen-to-square"></i> Project <span class="arrow-down"></span></a>
+            <ul class="dropdown-menu">
+               <li><a href="#">안드로이드 App</a></li>
+               <li><a href="#">아두이노 RC카</a></li>
+               <li><a href="#">STM</a></li>
+            </ul>
+         </li>
+         <li class="dropdown">
+            <a href="#"><i class="fa-solid fa-book"></i> Study <span class="arrow-down"></span></a>
+            <ul class="dropdown-menu">
+               <li><a href="#">HW</a></li>
+               <li><a href="#">FW</a></li>
+               <li><a href="pages/sw.html">SW</a></li>
+            </ul>
+         </li>
+      </ul>
+   </nav>
+
+   <div id="detailbox">
+
+
+
+
+
+       
+      <h4>글을 작성하는 공간입니다.</h4>
+      <span class="nameText">TEST<span>
+         <ul class="detailText">
+            <li>내용</li>
+         </ul>
+      </div>
+
+
+   </body>
+   </html>
