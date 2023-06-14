@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Recipe Search</title>
+  <style>
+    body {
+    background-image: url('check_sky.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+    .search-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .search-input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      width: 300px;
+    }
+
+    .search-button {
+      padding: 10px 20px;
+      background-color: #7BCEE5;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .recipe-container {
+      margin-top: 20px;
+    }
+
+    .recipe-card {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+
+    .recipe-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .recipe-image {
+      max-width: 200px;
+      height: auto;
+    }
+
+    .recipe-summary {
+      margin-top: 5px;
+    }
+
+    .recipe-popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      display: none;
+    }
+
+    .recipe-popup-content {
+      background-color: #fff;
+      border-radius: 5px;
+      padding: 20px;
+      max-width: 600px;
+      max-height: 80%;
+      overflow-y: auto;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      color: #333;
+      font-family: Arial, sans-serif;
+    }
+
+    .recipe-popup-content h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .recipe-popup-content p {
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .recipe-popup-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Recipe Search</h1>
+  <div class="search-container">
+    <input type="text" id="query" class="search-input" placeholder="Enter a keyword(ENG)">
+    <button onclick="searchRecipes()" class="search-button">Search</button>
+  </div>
+  <div id="results" class="recipe-container"></div>
+
+  <div id="recipePopup" class="recipe-popup">
+    <div class="recipe-popup-content">
+      <span class="recipe-popup-close" onclick="closePopup()">&times;</span>
+      <h2 id="popupTitle"></h2>
+      <img id="popupImage">
+      <p id="popupSummary"></p>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    var apiKey = 'af4dbc8fc8374a84a725d1c55767986a';
+
+    function searchRecipes() {
+      var query = document.getElementById('query').value;
+      var url = 'https://api.spoonacular.com/recipes/complexSearch?query=' + query + '&apiKey=' + apiKey;
+
+      // AJAX request to Spoonacular API
+      $.ajax({
+        url: url,
+        dataType: 'json',
+        success: function(response) {
+          var recipes = response.results;
+          var resultsDiv = document.getElementById('results');
+          resultsDiv.innerHTML = '';
+
+          // Loop through each recipe and display the information
+          for (var i = 0; i < recipes.length; i++) {
+            var recipe = recipes[i];
+            var recipeCard = document.createElement('div');
+            recipeCard.classList.add('recipe-card');
+            recipeCard.setAttribute('onclick', 'openPopup(' + recipe.id + ')');
+
+            var recipeTitle = document.createElement('h2');
+            recipeTitle.classList.add('recipe-title');
+            recipeTitle.innerText = recipe.title;
+
+            var recipeImage = document.createElement('img');
+            recipeImage.classList.add('recipe-image');
+            recipeImage.src = recipe.image;
+
+            var recipeSummary = document.createElement('p');
+            recipeSummary.classList.add('recipe-summary');
+            recipeSummary.innerText = recipe.summary;
+
+            recipeCard.appendChild(recipeTitle);
+            recipeCard.appendChild(recipeImage);
+            resultsDiv.appendChild(recipeCard);
+          }
+        },
+        error: function(xhr, status, error) {
+        if (xhr.status === 402) {
+          alert(' spoonacular API 일일 할당량을 초과했습니다. 내일 다시 시도해주세요.');
+        } else {
+          console.log('Error occurred while fetching recipes.');
+        }
+      }
+      });
+    }
+
+    function openPopup(recipeId) {
+      var url = 'https://api.spoonacular.com/recipes/' + recipeId + '/information?apiKey=' + apiKey;
+
+      // AJAX request to Spoonacular API
+      $.ajax({
+        url: url,
+        dataType: 'json',
+        success: function(response) {
+          var popupTitle = document.getElementById('popupTitle');
+          var popupImage = document.getElementById('popupImage');
+          var popupSummary = document.getElementById('popupSummary');
+
+          popupTitle.innerText = response.title;
+          popupImage.src = response.image;
+          popupSummary.innerHTML = '<span style="color: #333; font-size: 16px; line-height: 1.5;">' + response.summary + '</span>';
+
+          document.getElementById('recipePopup').style.display = 'flex';
+        },
+        error: function() {
+          console.log('Error occurred while fetching recipe details.');
+        }
+      });
+    }
+
+    function closePopup() {
+      document.getElementById('recipePopup').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
