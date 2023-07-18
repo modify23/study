@@ -1,75 +1,50 @@
 #include <stdio.h>
 #include <string.h>
 #include <iostream>
-class detect_position
-{
-private:
-	int x;
-	int y;
+#include <utility>
 
-public:
-	detect_position(int startX, int startY) : x(startX), y(startY) {}
-
-	int getX() const { return x; }
-	int getY() const { return y; }
-
-	void updatePosition(int newX, int newY) {
-		x = newX;
-		y = newY;
-	}
-};
+using namespace std;
 
 class location_Info {
-private:
-	char table_location[4][4];
-	char kitchen_location[1][1];
-	char other_location[8][8];
 public:
-	void setTableLocation(int x, int y, char location) {
-		if (x >= 0 && x < 4 && y >= 0 && y < 4) {
-			table_location[x][y] = location;
-		}
-	}
+	pair<double, double> table_location[5];
+	pair<double, double> kitchen_location[1];
+	pair<double, double> other_location[20];
 
-	void setKitchenLocation(int x, int y, char location) {
-		if (x == 0 && y == 0) {
-			kitchen_location[x][y] = location;
-		}
-	}
-
-	void setOtherLocation(int x, int y, char location) {
-		if (x >= 0 && x < 8 && y >= 0 && y < 8) {
-			other_location[x][y] = location;
-		}
-	}
-
-	char getLocation(const detect_position& pos) {
-		int xPos = pos.getX();
-		int yPos = pos.getY();
-
-		// table_location에서 위치 확인
-		if (xPos >= 0 && xPos < 4 && yPos >= 0 && yPos < 4) {
-			return table_location[xPos][yPos];
-		}
-
-		// kitchen_location에서 위치 확인
-		if (xPos == 0 && yPos == 0) {
-			return kitchen_location[xPos][yPos];
-		}
-
-		// other_location에서 위치 확인
-		if (xPos >= 0 && xPos < 8 && yPos >= 0 && yPos < 8) {
-			return other_location[xPos][yPos];
-		}
-
-		return ' ';  // 해당하는 위치가 없을 경우 공백 반환
-	}
+	void set_location() {};
 };
+
+class detect_position : public location_Info {
+private:
+	pair<double, double> Pos_X_Y; // xPos, yPos
+
+public:
+	pair<double, double> detect_sensor() {
+		return Pos_X_Y;
+	}
+
+	pair<double, double> detect_location() {
+        for (int i = 0; i < sizeof(table_location) / sizeof(table_location[0]); i++) {
+            if (Pos_X_Y == table_location[i])
+                return table_location[i]; 
+        }
+        for (int i = 0; i < sizeof(other_location) / sizeof(other_location[0]); i++) {
+            if (Pos_X_Y == other_location[i])
+                return other_location[i]; 
+        }
+        if (Pos_X_Y == kitchen_location[0])
+            return kitchen_location[0]; 
+        return make_pair(-1.0, -1.0); // return (-1, -1) if no matching location is found
+    }
+};
+
+
 
 class Order
 {
 private:
-	char menu[20][10];
+	char menu[10];
+	char menu_cost[10];
 	int sum;
 
 public:
@@ -80,6 +55,7 @@ class Screen
 {
 private:
 	int display_info;
+	int display_menu;
 	bool display_check;
 public:
 	Screen(int screen);
@@ -161,4 +137,3 @@ int main()
 {
 	return 0;
 }
-
