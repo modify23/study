@@ -6,13 +6,14 @@
 #include <chrono>
 
 using namespace std;
+int num = 1;
 
 class dayNnight {
 private:
 	int select_dayNnight = 0;
 	string day = "주간권";
 	string night = "야간권";
-	string ticket_dayNnight;
+	string dayNnight_save[10];
 
 public:
 	int sel_ticket() {
@@ -25,9 +26,16 @@ public:
 			cout << "다시 선택해주세요" << endl;
 			cin >> select_dayNnight;
 		}
-
-		return select_dayNnight;
+		if (select_dayNnight == 1) dayNnight_save[num-1] = day;
+		else if (select_dayNnight == 2) dayNnight_save[num - 1] = night;
+		return 0;
 	}
+
+	string* get_dayNnight_save() {
+		return dayNnight_save;
+	}
+
+	
 };
 
 class Birthdate {
@@ -46,6 +54,16 @@ public:
 			cin >> birthdate;
 			cin >> code;
 		}
+		while (((birthdate / 100) % 100) < 0 || ((birthdate / 100) % 100) > 13) {
+			cout << "잘못된 주민번호입니다. 다시 입력해주세요: " << endl;
+			cin >> birthdate;
+			cin >> code;
+		}
+		while (code < 0 || code > 9) {
+			cout << "잘못된 주민번호입니다. 다시 입력해주세요: " << endl;
+			cin >> birthdate;
+			cin >> code;
+		}
 		return birthdate;
 	}
 
@@ -54,6 +72,7 @@ public:
 class Age {
 private:
 	int age = 0;
+	string age_save[10];
 public :
 	int CustomerAge(int birthdate) {
 		auto now = chrono::system_clock::now();
@@ -72,10 +91,20 @@ public :
 		double seconds = difftime(end_time, birth_time);
 		int age = static_cast<int>(seconds) / (60 * 60 * 24 * 365);
 
-		cout << "Current Time and Date: " << ctime(&end_time);
+		//cout << "Current Time and Date: " << ctime(&end_time);
 		cout << "만나이: " << age << "세" << endl;
 
+		if (age >= 19 || age <= 64) age_save[num-1] = "대인";
+		else if (age >= 13 || age <= 18) age_save[num - 1] = "청소년";
+		else if (age >= 3 || age <= 12) age_save[num - 1] = "소인";
+		else if (age >= 65) age_save[num - 1] = "경로";
+		else if (age >= 2) age_save[num - 1] = "유아(무료)";
+
 		return age;
+	}
+
+	string* get_age_save() {
+		return age_save;
 	}
 };
 
@@ -89,12 +118,15 @@ private:
 	int Price_col_age = 0;
 	int Price_row = 0;
 	double discount = 0;
+
+	double customer_price_save[10] = { 0, };
 public:
 	double setPrice(int age, int discountType, int select_dayNnight) {
 		if (age >= 19 || age <= 64) Price_col_age = 0;
 		else if(age >= 13 || age <= 18) Price_col_age = 1;
-		else if (age >= 13 || age <= 18) Price_col_age = 2;
-		else if (age >= 13 || age <= 18) Price_col_age = 3;
+		else if (age >= 3 || age <= 12) Price_col_age = 2;
+		else if(age >= 65) Price_col_age = 3;
+		
 
 		if (select_dayNnight == 1) Price_row = 0;
 		else if (select_dayNnight == 2) Price_row = 1;
@@ -106,7 +138,15 @@ public:
 		else if (discountType == 5) discount = 0.85;
 
 		customer_price = price[Price_row][Price_col_age] * discount;
+		if (age <= 2) customer_price = 0;
+
+		customer_price_save[num - 1] = customer_price;
+
 		return customer_price;
+	}
+
+	double* get_customer_price_save() {
+		return customer_price_save;
 	}
 
 };
@@ -132,16 +172,34 @@ public:
 };
 
 class OrderCount {
-	
+private:
+	int ticketCount = 0;
+public:
+	void addTicket() {
+		ticketCount++;
+	}
+	int getTicketCount() {
+		return ticketCount;
+	}
 };
 
 class receipt {
 public :
-	void display_receipt(double customer_price, int age) {
-		cout << "===========영수증============" << endl;
-		cout << age << endl;
-		cout << customer_price << endl;
-		cout << "============================" << endl;
+	void display_receipt_top() {
+		cout << "=============영수증==============\n" << endl;
+		cout << "No.\t권종\t나이\t가격\t티켓수량" << endl;
+	}
+	void display_receipt(string dayNnight_save[], string age_save[], double customer_price_save[], int ticketCount) {
+		for (int i = 0; i < num; i++) {
+			cout << (i+1) << "\t";
+			cout << dayNnight_save[i] << "\t";
+			cout << age_save[i] << "\t";
+			cout << customer_price_save[i] << "원" << "\t" ;
+			cout << ticketCount << "장" << endl;
+		}
+	}
+	void display_receipt_bot() {
+		cout << "================================" << endl;
 	}
 };
 
@@ -151,17 +209,35 @@ int main() {
 	discount dc;
 	Age a;
 	receipt r;
-
-	int birth = b.CustomerBirthdate();
-	int select_dayNnight = d.sel_ticket();
-	int age = a.CustomerAge(birth);
-	int discountType = dc.set_discountType();
-
+	OrderCount orderCount; // 추가 발권을 위한 OrderCount 객체 생성
 	ticket_price tp;
-	double customer_price = tp.setPrice(age, discountType, select_dayNnight);
 
-	r.display_receipt(customer_price, age);
-	
+	int ticketCount = 0;
+
+	while (true) {
+		int select_dayNnight = d.sel_ticket();
+		int birth = b.CustomerBirthdate();
+		int age = a.CustomerAge(birth);
+		int discountType = dc.set_discountType();
+		double customer_price = tp.setPrice(age, discountType, select_dayNnight);
+
+		char addMore;
+		cout << "더 발권하시겠습니까? (Y/N): ";
+		cin >> addMore;
+		if (addMore == 'Y' || addMore == 'y') {
+			num++;
+			continue;
+		}
+		else {
+			string* dayNnight_save = d.get_dayNnight_save();
+			string* age_save = a.get_age_save();
+			double* customer_price_save = tp.get_customer_price_save();
+			r.display_receipt_top();
+			r.display_receipt(dayNnight_save, age_save, customer_price_save, orderCount.getTicketCount());
+			r.display_receipt_bot();
+			break; 
+		}
+	}
 
 	return 0;
 }
