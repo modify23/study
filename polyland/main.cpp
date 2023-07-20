@@ -9,21 +9,24 @@ using namespace std;
 
 class dayNnight {
 private:
-	int ticket_type;
+	int select_dayNnight = 0;
+	string day = "주간권";
+	string night = "야간권";
+	string ticket_dayNnight;
 
 public:
 	int sel_ticket() {
 		cout << "권종을 선택하세요" << endl;
-		cout << "1. 주간권" << endl;
-		cout << "2. 야간권" << endl;
-		cin >> ticket_type;
+		cout << "1\t" << day << endl;
+		cout << "2\t" << night << endl;
+		cin >> select_dayNnight;
 
-		while ((ticket_type != 1) && (ticket_type != 2)) {
+		while ((select_dayNnight != 1) && (select_dayNnight != 2)) {
 			cout << "다시 선택해주세요" << endl;
-			cin >> ticket_type;
+			cin >> select_dayNnight;
 		}
 
-		return ticket_type;
+		return select_dayNnight;
 	}
 };
 
@@ -31,10 +34,10 @@ class Birthdate {
 private:
 	int birthdate = 0;
 	int code = 0;
-	int age = 0;
+	
 public:
 	int CustomerBirthdate() {
-		cout << "주민번호 앞자리를 입력해주세요 : " << endl;
+		cout << "주민번호 앞자리(6자리)를 입력해주세요 : " << endl;
 		cin >> birthdate;
 		cout << "주민번호 뒷자리 첫번째까지 입력해 주세요 : " << endl;
 		cin >> code;
@@ -46,7 +49,13 @@ public:
 		return birthdate;
 	}
 
-	int CustomerAge() {
+};
+
+class Age {
+private:
+	int age = 0;
+public :
+	int CustomerAge(int birthdate) {
 		auto now = chrono::system_clock::now();
 		time_t end_time = chrono::system_clock::to_time_t(now);
 
@@ -61,24 +70,43 @@ public:
 		time_t birth_time = mktime(&birth_tm);
 
 		double seconds = difftime(end_time, birth_time);
-		int years = static_cast<int>(seconds) / (60 * 60 * 24 * 365);
+		int age = static_cast<int>(seconds) / (60 * 60 * 24 * 365);
 
 		cout << "Current Time and Date: " << ctime(&end_time);
-		cout << "만나이: " << years << "세" << endl;
+		cout << "만나이: " << age << "세" << endl;
 
-		return years;
+		return age;
 	}
 };
 
 class ticket_price {
 private:
-	int price[2][4] = {
+	double price[2][4] = {
 		{56000, 47000, 44000, 44000},
 		{46000, 40000, 37000, 37000}
 	};
+	double customer_price = 0;
+	int Price_col_age = 0;
+	int Price_row = 0;
+	double discount = 0;
 public:
-	void setPrice(int birthdate, int discountType, int ticket_type) {
+	double setPrice(int age, int discountType, int select_dayNnight) {
+		if (age >= 19 || age <= 64) Price_col_age = 0;
+		else if(age >= 13 || age <= 18) Price_col_age = 1;
+		else if (age >= 13 || age <= 18) Price_col_age = 2;
+		else if (age >= 13 || age <= 18) Price_col_age = 3;
 
+		if (select_dayNnight == 1) Price_row = 0;
+		else if (select_dayNnight == 2) Price_row = 1;
+
+		if (discountType == 1) discount = 1;
+		else if (discountType == 2) discount = 0.6;
+		else if (discountType == 3) discount = 0.5;
+		else if (discountType == 4) discount = 0.8;
+		else if (discountType == 5) discount = 0.85;
+
+		customer_price = price[Price_row][Price_col_age] * discount;
+		return customer_price;
 	}
 
 };
@@ -96,7 +124,7 @@ public:
 		cout << "5. 임산부" << endl;
 		cin >> discountType;
 		while (discountType < 1 || discountType > 5) {
-			cout << "잘못된 선택입니다. 다시 입력해주세요: ";
+			cout << "잘못된 선택입니다. 다시 입력해주세요: " <<endl;
 			cin >> discountType;
 		}
 		return discountType;
@@ -104,24 +132,35 @@ public:
 };
 
 class OrderCount {
+	
+};
 
+class receipt {
+public :
+	void display_receipt(double customer_price, int age) {
+		cout << "===========영수증============" << endl;
+		cout << age << endl;
+		cout << customer_price << endl;
+		cout << "============================" << endl;
+	}
 };
 
 int main() {
 	dayNnight d;
 	Birthdate b;
 	discount dc;
-	//int selected_ticket = d.sel_ticket();
-	int birth = b.CustomerBirthdate();
-	int time = b.CustomerAge();
-	//int dc_type = dc.set_discountType();
+	Age a;
+	receipt r;
 
-	/*
-	cout << "선택한 티켓: " << selected_ticket << endl;
-	cout << "주민번호: " << birth << endl;
-	cout << "만나이: " << time << "세" << endl;
-	cout << "우대사항: " << dc_type << endl;
-	*/
+	int birth = b.CustomerBirthdate();
+	int select_dayNnight = d.sel_ticket();
+	int age = a.CustomerAge(birth);
+	int discountType = dc.set_discountType();
+
+	ticket_price tp;
+	double customer_price = tp.setPrice(age, discountType, select_dayNnight);
+
+	r.display_receipt(customer_price, age);
 	
 
 	return 0;
