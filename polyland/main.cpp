@@ -34,8 +34,6 @@ public:
 	string* get_dayNnight_save() {
 		return dayNnight_save;
 	}
-
-	
 };
 
 class Birthdate {
@@ -49,12 +47,17 @@ public:
 		cin >> birthdate;
 		cout << "주민번호 뒷자리 첫번째까지 입력해 주세요 : " << endl;
 		cin >> code;
-		while (birthdate < 100000 || birthdate > 999999 || code < 0 || code > 9) {
+		while (birthdate < 100000 || birthdate > 999999 ) {
 			cout << "잘못된 주민번호입니다. 다시 입력해주세요: " << endl;
 			cin >> birthdate;
 			cin >> code;
 		}
 		while (((birthdate / 100) % 100) < 0 || ((birthdate / 100) % 100) > 13) {
+			cout << "잘못된 주민번호입니다. 다시 입력해주세요: " << endl;
+			cin >> birthdate;
+			cin >> code;
+		}
+		while ((birthdate % 100) < 0 || (birthdate % 100) > 31) {
 			cout << "잘못된 주민번호입니다. 다시 입력해주세요: " << endl;
 			cin >> birthdate;
 			cin >> code;
@@ -118,7 +121,7 @@ private:
 	int Price_col_age = 0;
 	int Price_row = 0;
 	double discount = 0;
-
+	double price_save[10] = { 0, };
 	double customer_price_save[10] = { 0, };
 public:
 	double setPrice(int age, int discountType, int select_dayNnight) {
@@ -140,9 +143,14 @@ public:
 		customer_price = price[Price_row][Price_col_age] * discount;
 		if (age <= 2) customer_price = 0;
 
+		price_save[num - 1] = price[Price_row][Price_col_age];
 		customer_price_save[num - 1] = customer_price;
 
 		return customer_price;
+	}
+
+	double* get_price_save() {
+		return price_save;
 	}
 
 	double* get_customer_price_save() {
@@ -154,6 +162,8 @@ public:
 class discount {
 private:
 	int discountType = 0;
+	string discountType_save[10];
+
 public:
 	int set_discountType() {
 		cout << "우대 사항을 선택하세요" << endl;
@@ -167,7 +177,18 @@ public:
 			cout << "잘못된 선택입니다. 다시 입력해주세요: " <<endl;
 			cin >> discountType;
 		}
+
+		if (discountType == 1) discountType_save[num - 1] = "없음";
+		else if (discountType == 2) discountType_save[num - 1] = "40%";
+		else if (discountType == 3) discountType_save[num - 1] = "50%";
+		else if (discountType == 4) discountType_save[num - 1] = "20%";
+		else if (discountType == 5) discountType_save[num - 1] = "15%";
+
 		return discountType;
+	}
+
+	string* get_discountType_save() {
+		return discountType_save;
 	}
 };
 
@@ -186,20 +207,22 @@ public:
 class receipt {
 public :
 	void display_receipt_top() {
-		cout << "=============영수증==============\n" << endl;
-		cout << "No.\t권종\t나이\t가격\t티켓수량" << endl;
+		cout << "===============영수증=================\n" << endl;
+		cout << "No.\t권종\t나이\t정가\t할인률\t가격\t티켓수량" << endl;
 	}
-	void display_receipt(string dayNnight_save[], string age_save[], double customer_price_save[], int ticketCount) {
+	void display_receipt(string dayNnight_save[], string age_save[], double price_save[], double customer_price_save[], string discountType_save[], int ticketCount) {
 		for (int i = 0; i < num; i++) {
-			cout << (i+1) << "\t";
-			cout << dayNnight_save[i] << "\t";
-			cout << age_save[i] << "\t";
-			cout << customer_price_save[i] << "원" << "\t" ;
-			cout << ticketCount << "장" << endl;
+			cout << (i+1) << "\t"; // No
+			cout << dayNnight_save[i] << "\t"; // 권종
+			cout << age_save[i] << "\t"; // 나이
+			cout << price_save[i] << "\t"; // 정가
+			cout << discountType_save[i] << "\t";
+			cout << customer_price_save[i] << "원" << "\t" ; // 가격
+			//cout << ticketCount << "장" << endl; // 티켓수량
 		}
 	}
 	void display_receipt_bot() {
-		cout << "================================" << endl;
+		cout << "=====================================" << endl;
 	}
 };
 
@@ -232,8 +255,10 @@ int main() {
 			string* dayNnight_save = d.get_dayNnight_save();
 			string* age_save = a.get_age_save();
 			double* customer_price_save = tp.get_customer_price_save();
+			double* price_save = tp.get_price_save();
+			string* discountType_save = dc.get_discountType_save();
 			r.display_receipt_top();
-			r.display_receipt(dayNnight_save, age_save, customer_price_save, orderCount.getTicketCount());
+			r.display_receipt(dayNnight_save, age_save, price_save, customer_price_save, discountType_save, orderCount.getTicketCount());
 			r.display_receipt_bot();
 			break; 
 		}
