@@ -5,6 +5,7 @@
 #include <iostream>
 #include <chrono>
 
+
 using namespace std;
 int num = 1;
 
@@ -30,7 +31,7 @@ public:
 		else if (select_dayNnight == 2) dayNnight_save[num - 1] = night;
 		return 0;
 	}
-
+		
 	string* get_dayNnight_save() {
 		return dayNnight_save;
 	}
@@ -38,36 +39,36 @@ public:
 
 class Birthdate {
 private:
-	int birthdate = 0;
-	int code = 0;
+	int registrationBirth = 0;
+	int registrationCentury = 0;
 	
 public:
-	int CustomerBirthdate() {
+	pair<int, int> CustomerBirthdate() {
 		cout << "주민번호 앞자리(6자리)를 입력해주세요 : " << endl;
-		cin >> birthdate;
+		cin >> registrationBirth;
 		cout << "주민번호 뒷자리 첫번째까지 입력해 주세요 : " << endl;
-		cin >> code;
-		while (birthdate < 100000 || birthdate > 999999 ) {
+		cin >> registrationCentury;
+		while (registrationBirth < 100000 || registrationBirth > 999999 ) {
 			cout << "잘못된 주민번호입니다. 다시 입력해주세요: " << endl;
-			cin >> birthdate;
-			cin >> code;
+			cin >> registrationBirth;
+			cin >> registrationCentury;
 		}
-		while (((birthdate / 100) % 100) < 0 || ((birthdate / 100) % 100) > 13) {
+		while (((registrationBirth / 100) % 100) < 0 || ((registrationBirth / 100) % 100) > 13) {
 			cout << "잘못된 주민번호입니다. 다시 입력해주세요: " << endl;
-			cin >> birthdate;
-			cin >> code;
+			cin >> registrationBirth;
+			cin >> registrationCentury;
 		}
-		while ((birthdate % 100) < 0 || (birthdate % 100) > 31) {
+		while ((registrationBirth % 100) < 0 || (registrationBirth % 100) > 31) {
 			cout << "잘못된 주민번호입니다. 다시 입력해주세요: " << endl;
-			cin >> birthdate;
-			cin >> code;
+			cin >> registrationBirth;
+			cin >> registrationCentury;
 		}
-		while (code < 0 || code > 9) {
+		while (registrationCentury < 0 || registrationCentury > 9) {
 			cout << "잘못된 주민번호입니다. 다시 입력해주세요: " << endl;
-			cin >> birthdate;
-			cin >> code;
+			cin >> registrationBirth;
+			cin >> registrationCentury;
 		}
-		return birthdate;
+		return make_pair(registrationBirth, registrationCentury);
 	}
 
 };
@@ -77,24 +78,32 @@ private:
 	int age = 0;
 	string age_save[10];
 public :
-	int CustomerAge(int birthdate) {
+	int CustomerAge( int registrationBirth, int registrationCentury ) {
 		auto now = chrono::system_clock::now();
 		time_t end_time = chrono::system_clock::to_time_t(now);
 
-		int birthYear = birthdate / 10000;
-		int birthMonth = (birthdate / 100) % 100;
-		int birthDay = birthdate % 100;
+		int birthYear = registrationBirth / 10000;
+		int birthMonth = (registrationBirth / 100) % 100;
+		int birthDay = registrationBirth % 100;
+
+		int century = (registrationCentury == 1 || registrationCentury == 2 || registrationCentury == 5 || registrationCentury == 6) ? 1900 : 2000;
+		int birthYearFull = century + birthYear;
 
 		struct tm birth_tm = { 0 };
-		birth_tm.tm_year = birthYear;
-		birth_tm.tm_mon = birthMonth;
+		birth_tm.tm_year = birthYear - 1900;
+		birth_tm.tm_mon = birthMonth - 1;
 		birth_tm.tm_mday = birthDay;
-		time_t birth_time = mktime(&birth_tm);
+		
+		// Convert current time to 'tm' struct
+		struct tm* end_tm = localtime(&end_time);
 
-		double seconds = difftime(end_time, birth_time);
-		int age = static_cast<int>(seconds) / (60 * 60 * 24 * 365);
+		// Calculate the age based on the difference in years
+		int age = end_tm->tm_year + 1900 - birthYearFull;
 
-		//cout << "Current Time and Date: " << ctime(&end_time);
+		// Adjust age if the birth date has not yet occurred this year
+		if (end_tm->tm_mon < birth_tm.tm_mon || (end_tm->tm_mon == birth_tm.tm_mon && end_tm->tm_mday < birth_tm.tm_mday)) {
+			age--;
+		}
 		cout << "만나이: " << age << "세" << endl;
 
 		if (age >= 19 || age <= 64) age_save[num-1] = "대인";
@@ -219,6 +228,7 @@ public :
 			cout << discountType_save[i] << "\t";
 			cout << customer_price_save[i] << "원" << "\t" ; // 가격
 			//cout << ticketCount << "장" << endl; // 티켓수량
+			cout << endl;
 		}
 	}
 	void display_receipt_bot() {
@@ -239,8 +249,10 @@ int main() {
 
 	while (true) {
 		int select_dayNnight = d.sel_ticket();
-		int birth = b.CustomerBirthdate();
-		int age = a.CustomerAge(birth);
+		pair<int, int> registrationData = b.CustomerBirthdate();
+		int registrationBirth = registrationData.first;
+		int registrationCentry = registrationData.second;
+		int age = a.CustomerAge(registrationBirth, registrationCentry);
 		int discountType = dc.set_discountType();
 		double customer_price = tp.setPrice(age, discountType, select_dayNnight);
 
