@@ -98,7 +98,7 @@ class Age {
 private:
 	int age = 0;
 	//string age_save[10];
-	vectir<string> age_save;
+	vector<string> age_save;
 public:
 	int CustomerAge(int registrationBirth, int registrationCentury) {
 		auto now = chrono::system_clock::now();
@@ -128,9 +128,9 @@ public:
 		}
 		cout << "만나이: " << age << "세" << endl;
 
-		if (age >= 19 || age <= 64) age_save.push_back("대인");
-		else if (age >= 13 || age <= 18)  age_save.push_back("청소년");
-		else if (age >= 3 || age <= 12)  age_save.push_back("소인");
+		if (age >= 19 && age <= 64) age_save.push_back("대인");
+		else if (age >= 13 && age <= 18)  age_save.push_back("청소년");
+		else if (age >= 3 && age <= 12)  age_save.push_back("소인");
 		else if (age >= 65)  age_save.push_back("경로");
 		else if (age <= 2)  age_save.push_back("유아(무료)");
 
