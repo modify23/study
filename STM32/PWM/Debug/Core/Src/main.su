@@ -1,0 +1,16 @@
+../Core/Src/main.c:78:5:_write	24	static
+../Core/Src/main.c:83:5:_read	24	static
+../Core/Src/main.c:88:5:__io_putchar	16	static
+../Core/Src/main.c:93:5:__io_getchar	16	static
+../Core/Src/main.c:103:5:scaling	16	static
+../Core/Src/main.c:114:5:main	24	static
+../Core/Src/main.c:194:6:SystemClock_Config	88	static
+../Core/Src/main.c:239:13:MX_NVIC_Init	8	static
+../Core/Src/main.c:251:13:MX_ADC1_Init	24	static
+../Core/Src/main.c:303:13:MX_ETH_Init	8	static
+../Core/Src/main.c:352:13:MX_TIM3_Init	64	static
+../Core/Src/main.c:411:13:MX_USART3_UART_Init	8	static
+../Core/Src/main.c:444:13:MX_USB_OTG_FS_PCD_Init	8	static
+../Core/Src/main.c:479:13:MX_GPIO_Init	56	static
+../Core/Src/main.c:530:6:HAL_ADC_ConvCpltCallback	16	static
+../Core/Src/main.c:543:6:Error_Handler	4	static,ignoring_inline_asm

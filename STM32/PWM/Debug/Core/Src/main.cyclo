@@ -1,0 +1,16 @@
+main.c:78:5:_write	1
+main.c:83:5:_read	1
+main.c:88:5:__io_putchar	1
+main.c:93:5:__io_getchar	1
+main.c:103:5:scaling	1
+main.c:114:5:main	1
+main.c:194:6:SystemClock_Config	3
+main.c:239:13:MX_NVIC_Init	1
+main.c:251:13:MX_ADC1_Init	3
+main.c:303:13:MX_ETH_Init	2
+main.c:352:13:MX_TIM3_Init	6
+main.c:411:13:MX_USART3_UART_Init	2
+main.c:444:13:MX_USB_OTG_FS_PCD_Init	2
+main.c:479:13:MX_GPIO_Init	1
+main.c:530:6:HAL_ADC_ConvCpltCallback	2
+main.c:543:6:Error_Handler	1
